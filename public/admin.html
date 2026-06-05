@@ -70,12 +70,6 @@
         <div class="stats-grid" id="statsGrid"></div>
         <div class="controls">
             <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索姓名/手机/邮箱..." oninput="loadData()">
-            <select class="filter-select" id="sessionFilter" onchange="loadData()">
-                <option value="">全部场次</option>
-                <option value="morning">🌅 晨间唤醒</option>
-                <option value="afternoon">☀️ 午后舒展</option>
-                <option value="evening">🌙 晚霞放松</option>
-            </select>
             <select class="filter-select" id="statusFilter" onchange="loadData()">
                 <option value="">全部状态</option>
                 <option value="pending">待确认</option>
@@ -88,7 +82,7 @@
                 <thead>
                     <tr>
                         <th>ID</th><th>姓名</th><th>邮箱</th><th>手机号</th><th>年龄</th>
-                        <th>性别</th><th>场次</th><th>水平</th><th>备注</th><th>状态</th>
+                        <th>性别</th><th>水平</th><th>备注</th><th>状态</th>
                         <th>报名时间</th><th>操作</th>
                     </tr>
                 </thead>
@@ -151,7 +145,7 @@
                 statsGrid.innerHTML = `
                     <div class="stat-card"><div class="stat-value">${data.data.total}</div><div class="stat-label">总报名人数</div></div>
                     <div class="stat-card"><div class="stat-value">${data.data.today}</div><div class="stat-label">今日新增</div></div>
-                    <div class="stat-card"><div class="stat-value">${Object.keys(data.data.sessions).length}</div><div class="stat-label">覆盖场次</div></div>
+                    <div class="stat-card"><div class="stat-value">${data.data.statuses.pending || 0}</div><div class="stat-label">待确认</div></div>
                     <div class="stat-card"><div class="stat-value">${data.data.statuses.confirmed || 0}</div><div class="stat-label">已确认</div></div>
                 `;
             } catch (error) {}
@@ -160,10 +154,9 @@
         async function loadData(page = 1) {
             currentPage = page;
             const search = document.getElementById('searchInput').value;
-            const session = document.getElementById('sessionFilter').value;
             const status = document.getElementById('statusFilter').value;
             try {
-                const params = new URLSearchParams({ page, limit: 20, search, session, status });
+                const params = new URLSearchParams({ page, limit: 20, search, status });
                 const res = await fetch(`/api/registrations?${params}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -172,7 +165,7 @@
                 tbody.innerHTML = data.data.map(r => `
                     <tr>
                         <td>${r.id}</td><td><strong>${r.name}</strong></td><td>${r.email || '-'}</td><td>${r.phone}</td>
-                        <td>${r.age || '-'}</td><td>${getGenderEmoji(r.gender)}</td><td>${getSessionName(r.session)}</td>
+                        <td>${r.age || '-'}</td><td>${getGenderEmoji(r.gender)}</td>
                         <td>${getLevelName(r.level)}</td><td>${r.remarks || '-'}</td>
                         <td><span class="badge badge-${r.status}">${getStatusName(r.status)}</span></td>
                         <td>${new Date(r.created_at).toLocaleString('zh-CN')}</td>
@@ -215,7 +208,6 @@
         }
 
         function getGenderEmoji(g) { return { male: '👨', female: '👩', other: '🤗' }[g] || '-'; }
-        function getSessionName(s) { return { morning: '🌅 晨间唤醒', afternoon: '☀️ 午后舒展', evening: '🌙 晚霞放松' }[s] || s; }
         function getLevelName(l) { return { beginner: '🌱 零基础', intermediate: '🌿 有基础', advanced: '🌳 经常练' }[l] || '-'; }
         function getStatusName(s) { return { pending: '待确认', confirmed: '已确认', cancelled: '已取消' }[s] || s; }
     </script>

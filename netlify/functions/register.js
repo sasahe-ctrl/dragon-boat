@@ -1,97 +1,127 @@
-const fs = require('fs');
-const path = require('path');
+const NOTION_TOKEN = process.env.NOTION_TOKEN;
+const NOTION_DATABASE_ID = '376b7c278a80802f8073e99620bf29ab';
 
-const DATA_FILE = process.env.NETLIFY ? '/tmp/registrations.json' : path.join(__dirname, '../../data/registrations.json');
-
-function initDataFile() {
-    if (!fs.existsSync(DATA_FILE)) {
-        const dir = path.dirname(DATA_FILE);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(DATA_FILE, '[]', 'utf8');
-    }
-}
-
-function readData() {
-    initDataFile();
-    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-}
-
-function writeData(data) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
-}
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json',
+};
 
 exports.handler = async (event) => {
-    if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            }
-        };
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers };
+  }
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, headers, body: JSON.stringify({ success: false, message: 'Method Not Allowed' }) };
+  }
+
+  try {
+    const { name, email, phone, age, gender, session, level, remarks } = JSON.parse(event.body);
+
+    // 必填校验
+    if (!name || !phone || !session) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, message: '请填写姓名、手机号和参加场次' }),
+      };
+    }
+    if (!/^1[3-9]\d{9}$/.test(phone)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, message: '手机号格式不正确' }),
+      };
     }
 
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: JSON.stringify({ success: false, message: '只支持 POST' }) };
+    // 重复检查：查询 Notion 是否已有相同手机号
+    const queryRes = await fetch(`https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${NOTION_TOKEN}`,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        filter: {
+          property: '手机号',
+          rich_text: { equals: phone.trim() },
+        },
+      }),
+    });
+
+    const queryData = await queryRes.json();
+    if (queryData.results && queryData.results.length > 0) {
+      return {
+        statusCode: 409,
+        headers,
+        body: JSON.stringify({ success: false, message: '该手机号已报名，请勿重复提交' }),
+      };
     }
 
-    try {
-        const { name, email, phone, age, gender, session, level, remarks } = JSON.parse(event.body);
+    // 写入 Notion
+    const createRes = await fetch('https://api.notion.com/v1/pages', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${NOTION_TOKEN}`,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        parent: { database_id: NOTION_DATABASE_ID },
+        properties: {
+          '姓名': {
+            title: [{ text: { content: name.trim() } }],
+          },
+          '手机号': {
+            rich_text: [{ text: { content: phone.trim() } }],
+          },
+          '邮箱': {
+            email: email ? email.trim().toLowerCase() : null,
+          },
+          '年龄': {
+            rich_text: [{ text: { content: age ? String(age) : '' } }],
+          },
+          '性别': {
+            select: gender ? { name: gender } : null,
+          },
+          '场次': {
+            rich_text: [{ text: { content: session || '' } }],
+          },
+          '水平': {
+            rich_text: [{ text: { content: level || '' } }],
+          },
+          '备注': {
+            rich_text: [{ text: { content: remarks ? remarks.trim() : '' } }],
+          },
+          '状态': {
+            select: { name: 'pending' },
+          },
+        },
+      }),
+    });
 
-        if (!name || !phone || !session) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ success: false, message: '请填写姓名、手机号、场次' })
-            };
-        }
-
-        if (!/^1[3-9]\d{9}$/.test(phone)) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ success: false, message: '手机号格式不正确' })
-            };
-        }
-
-        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ success: false, message: '邮箱格式不正确' })
-            };
-        }
-
-        const registrations = readData();
-        const duplicate = registrations.find(r => r.phone === phone || (email && r.email === email));
-        if (duplicate) {
-            return {
-                statusCode: 409,
-                body: JSON.stringify({ success: false, message: '该手机号或邮箱已报名' })
-            };
-        }
-
-        const newReg = {
-            id: Date.now().toString(),
-            name: name.trim(),
-            email: (email || '').trim().toLowerCase(),
-            phone: phone.trim(),
-            age: age || '',
-            gender: gender || '',
-            session,
-            level: level || '',
-            remarks: remarks ? remarks.trim() : '',
-            status: 'pending',
-            created_at: new Date().toISOString()
-        };
-
-        registrations.push(newReg);
-        writeData(registrations);
-
-        return {
-            statusCode: 201,
-            headers: { 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify({ success: true, message: '报名成功！端午安康！🐲' })
-        };
-    } catch (error) {
-        return { statusCode: 500, body: JSON.stringify({ success: false, message: '服务器错误' }) };
+    if (!createRes.ok) {
+      const err = await createRes.json();
+      console.error('Notion error:', err);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ success: false, message: '写入失败，请稍后再试' }),
+      };
     }
+
+    return {
+      statusCode: 201,
+      headers,
+      body: JSON.stringify({ success: true, message: '已收到您的报名！会所人员将与您联系确认。' }),
+    };
+  } catch (e) {
+    console.error('handler error:', e);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ success: false, message: '服务器错误: ' + e.message }),
+    };
+  }
 };

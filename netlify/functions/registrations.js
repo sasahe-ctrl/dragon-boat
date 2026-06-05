@@ -1,49 +1,94 @@
-const fs = require('fs');
-const path = require('path');
-const DATA_FILE = process.env.NETLIFY ? '/tmp/registrations.json' : path.join(__dirname, '../../data/registrations.json');
+const NOTION_TOKEN = process.env.NOTION_TOKEN;
+const NOTION_DATABASE_ID = '376b7c278a80802f8073e99620bf29ab';
+
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Content-Type': 'application/json',
+};
+
+function getProp(page, key, type) {
+  const prop = page.properties[key];
+  if (!prop) return '';
+  if (type === 'title') return prop.title?.[0]?.plain_text || '';
+  if (type === 'rich_text') return prop.rich_text?.[0]?.plain_text || '';
+  if (type === 'email') return prop.email || '';
+  if (type === 'select') return prop.select?.name || '';
+  return '';
+}
 
 exports.handler = async (event) => {
-    const auth = event.headers.authorization;
-    if (!auth || !auth.startsWith('Bearer ')) {
-        return { statusCode: 401, body: JSON.stringify({ success: false, message: '未授权' }) };
-    }
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers };
 
-    if (!fs.existsSync(DATA_FILE)) {
-        return {
-            statusCode: 200,
-            headers: { 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify({ success: true, data: [], pagination: { total: 0, page: 1, totalPages: 0 } })
-        };
-    }
-
-    const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  try {
     const params = event.queryStringParameters || {};
     const search = (params.search || '').toLowerCase();
-    const session = params.session || '';
-    const status = params.status || '';
-    const page = parseInt(params.page) || 1;
-    const limit = parseInt(params.limit) || 50;
+    const statusFilter = params.status || '';
+    const page = parseInt(params.page || '1');
+    const limit = parseInt(params.limit || '20');
 
-    let filtered = data;
+    // 拉取所有记录
+    let all = [];
+    let cursor = undefined;
+    do {
+      const body = { page_size: 100, sorts: [{ timestamp: 'created_time', direction: 'descending' }] };
+      if (cursor) body.start_cursor = cursor;
+      const res = await fetch(`https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${NOTION_TOKEN}`,
+          'Notion-Version': '2022-06-28',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      all = all.concat(data.results || []);
+      cursor = data.has_more ? data.next_cursor : undefined;
+    } while (cursor);
+
+    // 转换格式
+    let records = all.map(r => ({
+      id: r.id,
+      name: getProp(r, '姓名', 'title'),
+      phone: getProp(r, '手机号', 'rich_text'),
+      email: getProp(r, '邮箱', 'email'),
+      age: getProp(r, '年龄', 'rich_text'),
+      gender: getProp(r, '性别', 'select'),
+      level: getProp(r, '水平', 'rich_text'),
+      remarks: getProp(r, '备注', 'rich_text'),
+      status: getProp(r, '状态', 'select') || 'pending',
+      created_at: r.created_time,
+    }));
+
+    // 搜索过滤
     if (search) {
-        filtered = filtered.filter(r => r.name.toLowerCase().includes(search) || r.phone.includes(search) || r.email.includes(search));
+      records = records.filter(r =>
+        r.name.toLowerCase().includes(search) ||
+        r.phone.includes(search) ||
+        r.email.toLowerCase().includes(search)
+      );
     }
-    if (session) filtered = filtered.filter(r => r.session === session);
-    if (status) filtered = filtered.filter(r => r.status === status);
 
-    filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    // 状态过滤
+    if (statusFilter) {
+      records = records.filter(r => r.status === statusFilter);
+    }
 
-    const total = filtered.length;
-    const start = (page - 1) * limit;
-    const paginated = filtered.slice(start, start + limit);
+    const total = records.length;
+    const totalPages = Math.ceil(total / limit);
+    const data = records.slice((page - 1) * limit, page * limit);
 
     return {
-        statusCode: 200,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({
-            success: true,
-            data: paginated,
-            pagination: { total, page, limit, totalPages: Math.ceil(total / limit) }
-        })
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        data,
+        pagination: { total, totalPages, currentPage: page, limit },
+      }),
     };
+  } catch (e) {
+    return { statusCode: 500, headers, body: JSON.stringify({ success: false, message: e.message }) };
+  }
 };
