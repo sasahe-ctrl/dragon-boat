@@ -224,6 +224,98 @@
             100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0; }
         }
 
+
+        /* 成功页面 */
+        .success-page {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .success-page.show { display: block; }
+
+        .zongzi-bounce {
+            font-size: 100px;
+            display: block;
+            animation: zongziBounce 1s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+            transform-origin: center bottom;
+        }
+        @keyframes zongziBounce {
+            0%   { transform: translateY(-300px) rotate(-20deg); opacity: 0; }
+            60%  { transform: translateY(20px) rotate(5deg); opacity: 1; }
+            75%  { transform: translateY(-15px) rotate(-3deg); }
+            85%  { transform: translateY(8px) rotate(2deg); }
+            92%  { transform: translateY(-5px) rotate(-1deg); }
+            100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        }
+
+        .success-smile {
+            font-size: 60px;
+            display: block;
+            margin: 10px 0;
+            opacity: 0;
+            animation: smileAppear 0.6s ease forwards 0.8s;
+        }
+        @keyframes smileAppear {
+            from { opacity: 0; transform: scale(0.3) rotate(-30deg); }
+            to   { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        .success-title {
+            font-size: 26px; font-weight: 700;
+            background: linear-gradient(135deg, #2d5a27, #daa520);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 16px 0 10px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 1s;
+        }
+        .success-msg {
+            color: #555; font-size: 15px; line-height: 1.8;
+            padding: 0 10px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 1.2s;
+        }
+        .success-decor {
+            font-size: 28px; letter-spacing: 8px;
+            margin: 20px 0;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 1.4s;
+        }
+        .success-back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #2d5a27, #4a7c3f);
+            color: #ffd700; border: none; border-radius: 12px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 1.6s;
+            transition: transform 0.2s;
+        }
+        .success-back-btn:hover { transform: translateY(-2px); }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 额外端午背景元素 */
+        .deco-drum {
+            position: fixed; pointer-events: none; z-index: 0;
+            font-size: 50px; opacity: 0.12;
+            animation: floatBoat 25s linear infinite;
+        }
+        .deco-drum-1 { top: 40%; animation-delay: -5s; }
+        .deco-drum-2 { top: 60%; animation-delay: -15s; font-size: 35px; }
+
+        .deco-corner {
+            position: fixed; pointer-events: none; z-index: 0; opacity: 0.1;
+            font-size: 80px;
+        }
+        .deco-corner-tl { top: 10px; left: 10px; transform: rotate(-15deg); }
+        .deco-corner-tr { top: 10px; right: 10px; transform: rotate(15deg); }
+        .deco-corner-bl { bottom: 10px; left: 10px; transform: rotate(15deg); }
+        .deco-corner-br { bottom: 10px; right: 10px; transform: rotate(-15deg); }
         @media (max-width: 600px) {
             .container { padding: 25px 20px; border-radius: 20px; }
             .main-title { font-size: 22px; }
@@ -240,6 +332,12 @@
         <button class="lang-btn" onclick="setLang('ja')">日本語</button>
     </div>
 
+    <div class="deco-corner deco-corner-tl">🏮</div>
+    <div class="deco-corner deco-corner-tr">🐲</div>
+    <div class="deco-corner deco-corner-bl">🥁</div>
+    <div class="deco-corner deco-corner-br">🎑</div>
+    <div class="deco-drum deco-drum-1">🥁</div>
+    <div class="deco-drum deco-drum-2">🏮</div>
     <div class="bamboo-decoration bamboo-1">🎋</div>
     <div class="bamboo-decoration bamboo-2">🌿</div>
     <div class="bamboo-decoration bamboo-3">🎍</div>
@@ -360,6 +458,20 @@
             </button>
         </form>
 
+
+        <!-- 成功页面 -->
+        <div class="success-page" id="successPage">
+            <span class="zongzi-bounce">🍙</span>
+            <span class="success-smile">😄</span>
+            <div class="success-title" id="t-success-title">报名成功！</div>
+            <div class="success-msg" id="t-success-msg">
+                我们已收到您的报名申请<br>
+                请您耐心等待<br>
+                稍后将会有会所工作人员联系您
+            </div>
+            <div class="success-decor">🎋 🐲 🍙 🎊 🎋</div>
+            <button class="success-back-btn" id="t-success-back" onclick="resetForm()">返回重新报名</button>
+        </div>
         <div class="message" id="messageBox">
             <div id="messageContent"></div>
         </div>
@@ -397,6 +509,9 @@
                 validAge: '年龄必须在1-150之间 🎂',
                 validRemarks: '备注不能超过200个字符 💬',
                 validSession: '请选择参加场次 📅',
+                successTitle: '报名成功！🎉',
+                successMsg2: '我们已收到您的报名申请<br>请您耐心等待<br>稍后将会有会所工作人员联系您',
+                successBack: '返回重新报名',
             },
             en: {
                 badge: '🎋 Dragon Boat Festival',
@@ -427,6 +542,9 @@
                 validAge: 'Age must be between 1 and 150 🎂',
                 validRemarks: 'Notes cannot exceed 200 characters 💬',
                 validSession: 'Please select a session 📅',
+                successTitle: 'Registration Successful! 🎉',
+                successMsg2: 'We have received your registration.<br>Please wait patiently.<br>Our staff will contact you shortly.',
+                successBack: 'Register Again',
             },
             ja: {
                 badge: '🎋 端午の節句',
@@ -484,6 +602,11 @@
             document.getElementById('t-required').textContent = t.required;
             document.getElementById('t-required2').textContent = t.required;
             document.getElementById('t-required3').textContent = t.required;
+            if (document.getElementById('t-success-title')) {
+                document.getElementById('t-success-title').textContent = t.successTitle || '';
+                document.getElementById('t-success-msg').innerHTML = t.successMsg2 || '';
+                document.getElementById('t-success-back').textContent = t.successBack || '';
+            }
             document.getElementById('t-optional').textContent = t.optional;
             document.getElementById('t-submit').textContent = t.submit;
 
@@ -662,10 +785,7 @@
                 const data = await response.json();
                 if (response.ok && data.success) {
                     showCelebration();
-                    showMessage('success', t.successMsg);
-                    form.reset();
-                    form.querySelectorAll('.success, .error').forEach(el => el.classList.remove('success', 'error'));
-                    form.querySelectorAll('.error-text').forEach(el => el.style.display = 'none');
+                    showSuccessPage();
                 } else {
                     showMessage('error', data.message || t.errorDefault);
                 }
@@ -676,6 +796,29 @@
                 document.getElementById('t-submit').textContent = t.submit;
             }
         });
+
+        function showSuccessPage() {
+            document.getElementById('registrationForm').style.display = 'none';
+            document.getElementById('messageBox').style.display = 'none';
+            const successPage = document.getElementById('successPage');
+            successPage.classList.add('show');
+            successPage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // 更新成功页面文字为当前语言
+            const t = i18n[currentLang];
+            document.getElementById('t-success-title').textContent = t.successTitle || '报名成功！🎉';
+            document.getElementById('t-success-msg').innerHTML = t.successMsg2 || '';
+            document.getElementById('t-success-back').textContent = t.successBack || '返回重新报名';
+        }
+
+        function resetForm() {
+            document.getElementById('successPage').classList.remove('show');
+            const form = document.getElementById('registrationForm');
+            form.style.display = 'block';
+            form.reset();
+            form.querySelectorAll('.success, .error').forEach(el => el.classList.remove('success', 'error'));
+            form.querySelectorAll('.error-text').forEach(el => el.style.display = 'none');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         function showMessage(type, text) {
             const messageBox = document.getElementById('messageBox');
