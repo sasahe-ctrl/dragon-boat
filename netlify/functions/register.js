@@ -83,7 +83,7 @@ exports.handler = async (event) => {
             rich_text: [{ text: { content: age ? String(age) : '' } }],
           },
           '性别': {
-            select: gender ? { name: gender } : null,
+            rich_text: [{ text: { content: gender || '' } }],
           },
           '场次': {
             rich_text: [{ text: { content: session || '' } }],
