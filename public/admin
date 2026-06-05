@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 广粤会端午普拉提体验课</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif; background: #f5f5f5; min-height: 100vh; }
+
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #2d5a27, #4a7c3f, #6b8e23); }
+        .login-box { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
+        .login-box h1 { text-align: center; color: #2d5a27; margin-bottom: 30px; font-size: 24px; }
+        .login-input { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; margin-bottom: 15px; font-size: 15px; }
+        .login-input:focus { outline: none; border-color: #4caf50; }
+        .login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #2d5a27, #4a7c3f); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .login-error { color: #ef5350; text-align: center; margin-top: 10px; display: none; }
+
+        .admin-panel { display: none; }
+        .admin-header { background: white; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .admin-header h1 { color: #2d5a27; font-size: 20px; }
+        .logout-btn { padding: 8px 20px; background: #ef5350; color: white; border: none; border-radius: 8px; cursor: pointer; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; padding: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; }
+        .stat-value { font-size: 36px; font-weight: 700; color: #2d5a27; }
+        .stat-label { color: #666; margin-top: 5px; font-size: 14px; }
+
+        .controls { padding: 0 30px 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
+        .search-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; width: 250px; }
+        .filter-select { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
+
+        .table-container { padding: 0 30px 30px; overflow-x: auto; }
+        table { width: 100%; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-collapse: collapse; }
+        th { background: #2d5a27; color: white; padding: 15px; text-align: left; font-weight: 600; font-size: 14px; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        tr:hover { background: #f9fbe7; }
+
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .badge-pending { background: #fff3e0; color: #e65100; }
+        .badge-confirmed { background: #e8f5e9; color: #1b5e20; }
+        .badge-cancelled { background: #ffebee; color: #b71c1c; }
+
+        .action-btn { padding: 5px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; margin-right: 5px; }
+        .btn-confirm { background: #4caf50; color: white; }
+        .btn-cancel { background: #ff9800; color: white; }
+        .btn-delete { background: #ef5350; color: white; }
+
+        .pagination { display: flex; justify-content: center; gap: 10px; padding: 20px; }
+        .page-btn { padding: 8px 15px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer; }
+        .page-btn.active { background: #2d5a27; color: white; border-color: #2d5a27; }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="loginPage">
+        <div class="login-box">
+            <h1>🎋 管理后台</h1>
+            <input type="text" class="login-input" id="username" placeholder="用户名">
+            <input type="password" class="login-input" id="password" placeholder="密码">
+            <button class="login-btn" onclick="login()">登 录</button>
+            <div class="login-error" id="loginError">用户名或密码错误</div>
+        </div>
+    </div>
+
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-header">
+            <h1>🎋 广粤会 · 报名数据管理</h1>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="controls">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索姓名/手机/邮箱..." oninput="loadData()">
+            <select class="filter-select" id="sessionFilter" onchange="loadData()">
+                <option value="">全部场次</option>
+                <option value="morning">🌅 晨间唤醒</option>
+                <option value="afternoon">☀️ 午后舒展</option>
+                <option value="evening">🌙 晚霞放松</option>
+            </select>
+            <select class="filter-select" id="statusFilter" onchange="loadData()">
+                <option value="">全部状态</option>
+                <option value="pending">待确认</option>
+                <option value="confirmed">已确认</option>
+                <option value="cancelled">已取消</option>
+            </select>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th><th>姓名</th><th>邮箱</th><th>手机号</th><th>年龄</th>
+                        <th>性别</th><th>场次</th><th>水平</th><th>备注</th><th>状态</th>
+                        <th>报名时间</th><th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('adminToken');
+        let currentPage = 1;
+
+        if (token) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadStats();
+            loadData();
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    token = data.token;
+                    localStorage.setItem('adminToken', token);
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    loadStats();
+                    loadData();
+                } else {
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminToken');
+            token = null;
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                const statsGrid = document.getElementById('statsGrid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card"><div class="stat-value">${data.data.total}</div><div class="stat-label">总报名人数</div></div>
+                    <div class="stat-card"><div class="stat-value">${data.data.today}</div><div class="stat-label">今日新增</div></div>
+                    <div class="stat-card"><div class="stat-value">${Object.keys(data.data.sessions).length}</div><div class="stat-label">覆盖场次</div></div>
+                    <div class="stat-card"><div class="stat-value">${data.data.statuses.confirmed || 0}</div><div class="stat-label">已确认</div></div>
+                `;
+            } catch (error) {}
+        }
+
+        async function loadData(page = 1) {
+            currentPage = page;
+            const search = document.getElementById('searchInput').value;
+            const session = document.getElementById('sessionFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            try {
+                const params = new URLSearchParams({ page, limit: 20, search, session, status });
+                const res = await fetch(`/api/registrations?${params}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = data.data.map(r => `
+                    <tr>
+                        <td>${r.id}</td><td><strong>${r.name}</strong></td><td>${r.email || '-'}</td><td>${r.phone}</td>
+                        <td>${r.age || '-'}</td><td>${getGenderEmoji(r.gender)}</td><td>${getSessionName(r.session)}</td>
+                        <td>${getLevelName(r.level)}</td><td>${r.remarks || '-'}</td>
+                        <td><span class="badge badge-${r.status}">${getStatusName(r.status)}</span></td>
+                        <td>${new Date(r.created_at).toLocaleString('zh-CN')}</td>
+                        <td>
+                            ${r.status === 'pending' ? `<button class="action-btn btn-confirm" onclick="updateStatus('${r.id}','confirmed')">确认</button>` : ''}
+                            ${r.status !== 'cancelled' ? `<button class="action-btn btn-cancel" onclick="updateStatus('${r.id}','cancelled')">取消</button>` : ''}
+                            <button class="action-btn btn-delete" onclick="deleteRecord('${r.id}')">删除</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                const pagination = document.getElementById('pagination');
+                pagination.innerHTML = '';
+                for (let i = 1; i <= data.pagination.totalPages; i++) {
+                    pagination.innerHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="loadData(${i})">${i}</button>`;
+                }
+            } catch (error) {}
+        }
+
+        async function updateStatus(id, status) {
+            try {
+                await fetch(`/api/update-status/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status })
+                });
+                loadData(currentPage); loadStats();
+            } catch (error) {}
+        }
+
+        async function deleteRecord(id) {
+            if (!confirm('确定要删除这条记录吗？')) return;
+            try {
+                await fetch(`/api/delete/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                loadData(currentPage); loadStats();
+            } catch (error) {}
+        }
+
+        function getGenderEmoji(g) { return { male: '👨', female: '👩', other: '🤗' }[g] || '-'; }
+        function getSessionName(s) { return { morning: '🌅 晨间唤醒', afternoon: '☀️ 午后舒展', evening: '🌙 晚霞放松' }[s] || s; }
+        function getLevelName(l) { return { beginner: '🌱 零基础', intermediate: '🌿 有基础', advanced: '🌳 经常练' }[l] || '-'; }
+        function getStatusName(s) { return { pending: '待确认', confirmed: '已确认', cancelled: '已取消' }[s] || s; }
+    </script>
+</body>
+</html>

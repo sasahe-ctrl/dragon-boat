@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>尽情放"粽"，尽情拉伸 - 广粤会端午普拉提体验课</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c3f 30%, #6b8e23 60%, #8fbc8f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 背景装饰 - 飘动的竹叶 */
+        .bamboo-decoration {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
+            animation: sway 6s ease-in-out infinite;
+        }
+
+        .bamboo-1 {
+            top: -50px;
+            left: -30px;
+            font-size: 200px;
+            animation-delay: 0s;
+        }
+
+        .bamboo-2 {
+            bottom: -80px;
+            right: -40px;
+            font-size: 250px;
+            animation-delay: -2s;
+            transform: rotate(15deg);
+        }
+
+        .bamboo-3 {
+            top: 50%;
+            left: -20px;
+            font-size: 150px;
+            animation-delay: -4s;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        /* 飘动的龙舟 */
+        .dragon-boat {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            font-size: 60px;
+            animation: floatBoat 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        .dragon-boat-1 {
+            top: 15%;
+            animation-delay: 0s;
+        }
+
+        .dragon-boat-2 {
+            top: 75%;
+            animation-delay: -10s;
+            font-size: 45px;
+        }
+
+        @keyframes floatBoat {
+            0% { left: -100px; }
+            100% { left: calc(100% + 100px); }
+        }
+
+        /* 飘落的粽叶 */
+        .leaf-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            font-size: 24px;
+            animation: fall linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 主卡片 */
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 520px;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 3px solid transparent;
+            background-clip: padding-box;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(135deg, #2d5a27, #8fbc8f, #daa520, #8fbc8f, #2d5a27);
+            border-radius: 27px;
+            z-index: -1;
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 顶部装饰条 */
+        .top-decoration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2d5a27, #6b8e23, #daa520, #cd853f, #8b4513);
+            border-radius: 24px 24px 0 0;
+        }
+
+        /* 标题区域 */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 10px;
+        }
+
+        .festival-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #2d5a27, #4a7c3f);
+            color: #ffd700;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            border: 1px solid rgba(218, 165, 32, 0.3);
+        }
+
+        .main-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2d5a27, #daa520, #8b4513);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* 粽子分隔线 */
+        .zongzi-divider {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 20px;
+            letter-spacing: 8px;
+            color: #6b8e23;
+            opacity: 0.5;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: #2d5a27;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .label-icon {
+            font-size: 18px;
+        }
+
+        .required-badge {
+            background: #ffd700;
+            color: #2d5a27;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .optional-tag {
+            font-size: 11px;
+            color: #81c784;
+            font-weight: 400;
+            background: #e8f5e9;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 2px;
+        }
+
+        /* 输入框 - 绿色主题 */
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #c8e6c9;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            background: #f1f8e9;
+            color: #333;
+        }
+
+        .form-input::placeholder {
+            color: #a5d6a7;
+        }
+
+        .form-input:hover {
+            border-color: #81c784;
+            background: #f9fbe7;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4caf50;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.15), 0 0 20px rgba(76, 175, 80, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #ef5350;
+            background: #fff5f5;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .form-input.success {
+            border-color: #66bb6a;
+            background: #f1f8e9;
+        }
+
+        .error-text {
+            color: #ef5350;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            padding-left: 4px;
+        }
+
+        /* 选择框样式 */
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234caf50' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+
+        /* 文本域 */
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        /* 提交按钮 */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c3f 50%, #6b8e23 100%);
+            color: #ffd700;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 10px;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(45, 90, 39, 0.4);
+            background: linear-gradient(135deg, #3a7a33 0%, #5a9a4f 50%, #7ba832 100%);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .submit-btn .btn-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 消息提示 */
+        .message {
+            display: none;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            animation: messageSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .message.success {
+            display: block;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            color: #2d5a27;
+            border: 2px solid #81c784;
+        }
+
+        .message.error {
+            display: block;
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            color: #c62828;
+            border: 2px solid #ef5350;
+        }
+
+        /* 庆祝动画 */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .confetti {
+            position: absolute;
+            animation: confettiFall 2.5s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg) scale(0);
+                opacity: 1;
+            }
+            20% {
+                transform: translateY(10vh) rotate(90deg) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px 20px;
+                border-radius: 20px;
+            }
+            
+            .main-title {
+                font-size: 26px;
+            }
+            
+            .form-input {
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+            
+            .submit-btn {
+                padding: 13px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景装饰元素 -->
+    <div class="bamboo-decoration bamboo-1">🎋</div>
+    <div class="bamboo-decoration bamboo-2">🌿</div>
+    <div class="bamboo-decoration bamboo-3">🎍</div>
+    
+    <div class="dragon-boat dragon-boat-1">🐲</div>
+    <div class="dragon-boat dragon-boat-2">⛵</div>
+
+    <!-- 庆祝动画容器 -->
+    <div class="celebration" id="celebrationContainer"></div>
+
+    <!-- 主卡片 -->
+    <div class="container" id="mainCard">
+        <div class="top-decoration"></div>
+        
+        <!-- 标题区域 -->
+        <div class="header">
+            <div class="festival-badge">🎋 粽情端午</div>
+            <h1 class="main-title">
+                尽情放"粽"，尽情拉伸 🧘
+            </h1>
+            <p class="subtitle">广粤会 · 端午普拉提体验课</p>
+        </div>
+
+        <div class="zongzi-divider">🍙 ━━━ 🎋 ━━━ 🍙</div>
+
+        <!-- 表单 -->
+        <form id="registrationForm" novalidate>
+            <!-- 姓名 -->
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="label-icon">👤</span>
+                    姓名
+                    <span class="required-badge">必填</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    class="form-input"
+                    placeholder="请输入您的姓名"
+                    maxlength="20"
+                >
+                <div class="error-text" id="nameError"></div>
+            </div>
+
+            <!-- 邮箱（选填） -->
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="label-icon">📧</span>
+                    邮箱
+                    <span class="optional-tag">选填</span>
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    class="form-input"
+                    placeholder="有邮箱可以留一个（选填）"
+                >
+                <div class="error-text" id="emailError"></div>
+            </div>
+
+            <!-- 手机号 -->
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="label-icon">📱</span>
+                    手机号码
+                    <span class="required-badge">必填</span>
+                </label>
+                <input 
+                    type="tel" 
+                    id="phone" 
+                    class="form-input"
+                    placeholder="请输入11位手机号"
+                    maxlength="11"
+                >
+                <div class="error-text" id="phoneError"></div>
+            </div>
+
+            <!-- 年龄 -->
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="label-icon">🎂</span>
+                    年龄
+                </label>
+                <input 
+                    type="number" 
+                    id="age" 
+                    class="form-input"
+                    placeholder="请输入年龄"
+                    min="1" 
+                    max="150"
+                >
+                <div class="error-text" id="ageError"></div>
+            </div>
+
+            <!-- 性别 -->
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="label-icon">💁</span>
+                    性别
+                </label>
+                <select id="gender" class="form-input form-select">
+                    <option value="">请选择性别</option>
+                    <option value="male">👨 男</option>
+                    <option value="female">👩 女</option>
+                    <option value="other">🤗 其他</option>
+                </select>
+            </div>
+
+            <!-- 参加场次 -->
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="label-icon">📅</span>
+                    参加场次
+                    <span class="required-badge">必填</span>
+                </label>
+                <select id="session" class="form-input form-select">
+                    <option value="">请选择场次</option>
+                    <option value="morning">🌅 晨间唤醒 (08:00-09:30)</option>
+                    <option value="afternoon">☀️ 午后舒展 (14:00-15:30)</option>
+                    <option value="evening">🌙 晚霞放松 (18:00-19:30)</option>
+                </select>
+                <div class="error-text" id="sessionError"></div>
+            </div>
+
+            <!-- 普拉提基础 -->
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="label-icon">🧘</span>
+                    普拉提基础
+                </label>
+                <select id="level" class="form-input form-select">
+                    <option value="">请选择您的水平</option>
+                    <option value="beginner">🌱 零基础体验</option>
+                    <option value="intermediate">🌿 有些基础</option>
+                    <option value="advanced">🌳 经常练习</option>
+                </select>
+            </div>
+
+            <!-- 备注 -->
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="label-icon">💬</span>
+                    备注
+                </label>
+                <textarea 
+                    id="remarks" 
+                    class="form-input form-textarea"
+                    placeholder="如有特殊需求请在此说明（选填）"
+                    maxlength="200"
+                ></textarea>
+                <div class="error-text" id="remarksError"></div>
+            </div>
+
+            <!-- 提交按钮 -->
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <span class="btn-text">🎋 端 午 报 名 🎋</span>
+            </button>
+        </form>
+
+        <!-- 消息区域 -->
+        <div class="message" id="messageBox">
+            <div id="messageContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 飘落粽叶动画 ==========
+        function createFallingLeaves() {
+            const leaves = ['🍃', '🌿', '🍀', '🎋'];
+            
+            setInterval(() => {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf-particle';
+                leaf.textContent = leaves[Math.floor(Math.random() * leaves.length)];
+                leaf.style.left = Math.random() * 100 + '%';
+                leaf.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                leaf.style.fontSize = (Math.random() * 20 + 16) + 'px';
+                document.body.appendChild(leaf);
+                
+                setTimeout(() => leaf.remove(), 10000);
+            }, 2000);
+        }
+
+        createFallingLeaves();
+
+        // ========== 庆祝动画 ==========
+        function showCelebration() {
+            const container = document.getElementById('celebrationContainer');
+            const emojis = ['🥳', '🎉', '🎊', '🎋', '🍙', '🧘‍♀️', '✨', '💚', '🐲', '🏮'];
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = -(Math.random() * 100) + 'px';
+                    confetti.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                    confetti.style.animationDuration = (Math.random() * 1.5 + 2) + 's';
+                    container.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        // ========== 表单验证 ==========
+        class FormValidator {
+            constructor() {
+                this.rules = {
+                    name: {
+                        required: true,
+                        minLength: 2,
+                        maxLength: 20,
+                        pattern: /^[a-zA-Z\u4e00-\u9fa5·\s]+$/,
+                        messages: {
+                            required: '请输入姓名 🏷️',
+                            minLength: '姓名至少2个字符 ✏️',
+                            maxLength: '姓名不能超过20个字符 📏',
+                            pattern: '姓名只能包含中文和英文 🈶'
+                        }
+                    },
+                    email: {
+                        required: false,
+                        pattern: /^$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        messages: {
+                            pattern: '请输入有效的邮箱地址 ✉️'
+                        }
+                    },
+                    phone: {
+                        required: true,
+                        pattern: /^1[3-9]\d{9}$/,
+                        messages: {
+                            required: '请输入手机号码 📱',
+                            pattern: '请输入有效的11位手机号码 📞'
+                        }
+                    },
+                    age: {
+                        required: false,
+                        custom: (value) => {
+                            if (!value) return true;
+                            const age = parseInt(value);
+                            return age >= 1 && age <= 150;
+                        },
+                        messages: {
+                            custom: '年龄必须在1-150之间 🎂'
+                        }
+                    },
+                    session: {
+                        required: true,
+                        messages: {
+                            required: '请选择参加场次 📅'
+                        }
+                    },
+                    remarks: {
+                        required: false,
+                        maxLength: 200,
+                        messages: {
+                            maxLength: '备注不能超过200个字符 💬'
+                        }
+                    }
+                };
+            }
+
+            validateField(fieldName, value) {
+                const rule = this.rules[fieldName];
+                if (!rule) return { valid: true };
+
+                if (rule.required && (!value || value.trim() === '')) {
+                    return { valid: false, message: rule.messages.required };
+                }
+
+                if (!rule.required && (!value || value.trim() === '')) {
+                    return { valid: true };
+                }
+
+                if (rule.pattern && !rule.pattern.test(value)) {
+                    return { valid: false, message: rule.messages.pattern };
+                }
+
+                if (rule.minLength && value.length < rule.minLength) {
+                    return { valid: false, message: rule.messages.minLength };
+                }
+                if (rule.maxLength && value.length > rule.maxLength) {
+                    return { valid: false, message: rule.messages.maxLength };
+                }
+
+                if (rule.custom && !rule.custom(value)) {
+                    return { valid: false, message: rule.messages.custom };
+                }
+
+                return { valid: true };
+            }
+
+            validateAll(formData) {
+                const errors = {};
+                let isValid = true;
+
+                for (const [field, value] of Object.entries(formData)) {
+                    const result = this.validateField(field, value);
+                    if (!result.valid) {
+                        errors[field] = result.message;
+                        isValid = false;
+                    }
+                }
+
+                return { isValid, errors };
+            }
+        }
+
+        // ========== 应用初始化 ==========
+        const validator = new FormValidator();
+        const form = document.getElementById('registrationForm');
+
+        // 实时验证
+        form.addEventListener('input', function(e) {
+            if (e.target.classList.contains('form-input')) {
+                const field = e.target;
+                const result = validator.validateField(field.id, field.value);
+                
+                const errorEl = document.getElementById(field.id + 'Error');
+                if (errorEl) {
+                    if (!result.valid) {
+                        field.classList.add('error');
+                        field.classList.remove('success');
+                        errorEl.textContent = result.message;
+                        errorEl.style.display = 'block';
+                    } else if (field.value) {
+                        field.classList.remove('error');
+                        field.classList.add('success');
+                        errorEl.style.display = 'none';
+                    } else {
+                        field.classList.remove('error', 'success');
+                        errorEl.style.display = 'none';
+                    }
+                }
+            }
+        });
+
+        // 表单提交
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                session: document.getElementById('session').value,
+                level: document.getElementById('level').value,
+                remarks: document.getElementById('remarks').value.trim()
+            };
+
+            const validation = validator.validateAll(formData);
+
+            if (!validation.isValid) {
+                for (const [field, message] of Object.entries(validation.errors)) {
+                    const input = document.getElementById(field);
+                    const errorEl = document.getElementById(field + 'Error');
+                    if (input) input.classList.add('error');
+                    if (errorEl) {
+                        errorEl.textContent = message;
+                        errorEl.style.display = 'block';
+                    }
+                }
+                showMessage('error', '请检查并修正表单信息 📝');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.btn-text').textContent = '🥟 正在提交...';
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showCelebration();
+                    showMessage('success', '🎉 报名成功！端午安康！🐲');
+                    
+                    form.reset();
+                    form.querySelectorAll('.success, .error').forEach(el => {
+                        el.classList.remove('success', 'error');
+                    });
+                    form.querySelectorAll('.error-text').forEach(el => {
+                        el.style.display = 'none';
+                    });
+                } else {
+                    showMessage('error', data.message || '提交失败，请稍后重试 😥');
+                }
+            } catch (error) {
+                showMessage('error', '网络错误，请稍后重试 😥');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.querySelector('.btn-text').textContent = '🎋 端 午 报 名 🎋';
+            }
+        });
+
+        function showMessage(type, text) {
+            const messageBox = document.getElementById('messageBox');
+            const messageContent = document.getElementById('messageContent');
+            
+            messageBox.className = 'message ' + type;
+            messageContent.innerHTML = text;
+            
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
+        }
+
+        // 手机号输入限制
+        document.getElementById('phone').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+    </script>
+</body>
+</html>

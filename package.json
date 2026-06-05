@@ -1,0 +1,12 @@
+{
+  "name": "dragon-boat-registration",
+  "version": "1.0.0",
+  "description": "广粤会端午普拉提体验课报名系统",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step'"
+  },
+  "dependencies": {
+    "@netlify/functions": "^2.4.0"
+  }
+}
