@@ -1,5 +1,5 @@
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
-const NOTION_DATABASE_ID = '376b7c278a80802f8073e99620bf29ab';
+const NOTION_DATABASE_ID = '376b7c278a808060be37e250054c7aa5';
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
