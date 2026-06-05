@@ -229,23 +229,32 @@
         .success-page {
             display: none;
             text-align: center;
-            padding: 20px 0;
+            padding: 10px 0 20px;
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .success-top {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 0;
         }
         .success-page.show { display: block; }
 
         .zongzi-bounce {
-            font-size: 100px;
+            width: 160px;
+            height: 160px;
+            object-fit: contain;
             display: block;
-            animation: zongziBounce 1s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+            margin: 0 auto;
+            animation: zongziBounce 1s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards 0.8s; opacity: 0;
             transform-origin: center bottom;
         }
         @keyframes zongziBounce {
             0%   { transform: translateY(-300px) rotate(-20deg); opacity: 0; }
             60%  { transform: translateY(20px) rotate(5deg); opacity: 1; }
-            75%  { transform: translateY(-15px) rotate(-3deg); }
-            85%  { transform: translateY(8px) rotate(2deg); }
-            92%  { transform: translateY(-5px) rotate(-1deg); }
+            75%  { transform: translateY(-15px) rotate(-3deg); opacity: 1; }
+            85%  { transform: translateY(8px) rotate(2deg); opacity: 1; }
+            92%  { transform: translateY(-5px) rotate(-1deg); opacity: 1; }
             100% { transform: translateY(0) rotate(0deg); opacity: 1; }
         }
 
@@ -254,7 +263,7 @@
             display: block;
             margin: 10px 0;
             opacity: 0;
-            animation: smileAppear 0.6s ease forwards 0.8s;
+            animation: smileAppear 0.6s ease forwards 0.6s;
         }
         @keyframes smileAppear {
             from { opacity: 0; transform: scale(0.3) rotate(-30deg); }
@@ -266,15 +275,16 @@
             background: linear-gradient(135deg, #2d5a27, #daa520);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin: 16px 0 10px;
+            margin: 0 0 10px;
             opacity: 0;
-            animation: fadeUp 0.6s ease forwards 1s;
+            animation: fadeUp 0.6s ease forwards 0.2s;
         }
         .success-msg {
             color: #555; font-size: 15px; line-height: 1.8;
             padding: 0 10px;
+            margin-bottom: 16px;
             opacity: 0;
-            animation: fadeUp 0.6s ease forwards 1.2s;
+            animation: fadeUp 0.6s ease forwards 0.4s;
         }
         .success-decor {
             font-size: 28px; letter-spacing: 8px;
@@ -461,15 +471,15 @@
 
         <!-- 成功页面 -->
         <div class="success-page" id="successPage">
-            <span class="zongzi-bounce">🍙</span>
-            <span class="success-smile">😄</span>
-            <div class="success-title" id="t-success-title">报名成功！</div>
+            <div class="success-title" id="t-success-title">报名成功！🎉</div>
             <div class="success-msg" id="t-success-msg">
                 我们已收到您的报名申请<br>
                 请您耐心等待<br>
                 稍后将会有会所工作人员联系您
             </div>
-            <div class="success-decor">🎋 🐲 🍙 🎊 🎋</div>
+            <span class="success-smile">😄</span>
+            <img src="/zongzi.png" class="zongzi-bounce" alt="粽子">
+            <div class="success-decor">🎋 🐲 🎊 🎋</div>
             <button class="success-back-btn" id="t-success-back" onclick="resetForm()">返回重新报名</button>
         </div>
         <div class="message" id="messageBox">
