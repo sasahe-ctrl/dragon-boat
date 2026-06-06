@@ -241,13 +241,12 @@
         .success-page.show { display: block; }
 
         .zongzi-bounce {
-            width: 160px;
-            height: 160px;
-            object-fit: contain;
             display: block;
-            margin: 0 auto;
-            animation: zongziBounce 1s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards 0.8s; opacity: 0;
+            margin: 10px auto 0;
+            animation: zongziBounce 1s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards 0.8s;
+            opacity: 0;
             transform-origin: center bottom;
+            width: fit-content;
         }
         @keyframes zongziBounce {
             0%   { transform: translateY(-300px) rotate(-20deg); opacity: 0; }
@@ -256,18 +255,6 @@
             85%  { transform: translateY(8px) rotate(2deg); opacity: 1; }
             92%  { transform: translateY(-5px) rotate(-1deg); opacity: 1; }
             100% { transform: translateY(0) rotate(0deg); opacity: 1; }
-        }
-
-        .success-smile {
-            font-size: 60px;
-            display: block;
-            margin: 10px 0;
-            opacity: 0;
-            animation: smileAppear 0.6s ease forwards 0.6s;
-        }
-        @keyframes smileAppear {
-            from { opacity: 0; transform: scale(0.3) rotate(-30deg); }
-            to   { opacity: 1; transform: scale(1) rotate(0deg); }
         }
 
         .success-title {
@@ -477,8 +464,39 @@
                 请您耐心等待<br>
                 稍后将会有会所工作人员联系您
             </div>
-            <span class="success-smile">😄</span>
-            <img src="/zongzi.png" class="zongzi-bounce" alt="粽子">
+            <div class="zongzi-bounce">
+                <svg viewBox="0 0 240 280" width="180" height="210" xmlns="http://www.w3.org/2000/svg">
+                  <polygon points="120,260 20,80 220,80" fill="#3a7d44"/>
+                  <line x1="120" y1="260" x2="78" y2="88" stroke="#2d6235" stroke-width="1.5" opacity="0.5"/>
+                  <line x1="120" y1="260" x2="108" y2="82" stroke="#2d6235" stroke-width="1.5" opacity="0.5"/>
+                  <line x1="120" y1="260" x2="132" y2="82" stroke="#2d6235" stroke-width="1.5" opacity="0.5"/>
+                  <line x1="120" y1="260" x2="162" y2="88" stroke="#2d6235" stroke-width="1.5" opacity="0.5"/>
+                  <polygon points="120,232 35,92 205,92" fill="#4a9455"/>
+                  <polygon points="120,205 52,104 188,104" fill="#5aaa64"/>
+                  <polygon points="120,158 72,112 168,112" fill="#f5f0e0"/>
+                  <circle cx="108" cy="126" r="4" fill="#e8dfc0" opacity="0.8"/>
+                  <circle cx="120" cy="120" r="4" fill="#e8dfc0" opacity="0.8"/>
+                  <circle cx="132" cy="126" r="4" fill="#e8dfc0" opacity="0.8"/>
+                  <circle cx="114" cy="138" r="4" fill="#e8dfc0" opacity="0.8"/>
+                  <circle cx="126" cy="138" r="4" fill="#e8dfc0" opacity="0.8"/>
+                  <circle cx="120" cy="148" r="5" fill="#c8391a" opacity="0.9"/>
+                  <path d="M50,172 Q120,162 190,172" stroke="#c0392b" stroke-width="5" fill="none" stroke-linecap="round"/>
+                  <ellipse cx="120" cy="170" rx="12" ry="8" fill="#c0392b"/>
+                  <ellipse cx="120" cy="170" rx="7" ry="5" fill="#e74c3c"/>
+                  <path d="M108,170 Q95,157 90,167 Q95,177 108,170" fill="#c0392b"/>
+                  <path d="M132,170 Q145,157 150,167 Q145,177 132,170" fill="#c0392b"/>
+                  <polygon points="120,42 100,88 140,88" fill="#2d6235"/>
+                  <line x1="120" y1="42" x2="120" y2="88" stroke="#1e4d26" stroke-width="1" opacity="0.6"/>
+                  <circle cx="22" cy="118" r="5" fill="#f39c12"/>
+                  <circle cx="35" cy="92" r="4" fill="#e74c3c"/>
+                  <circle cx="12" cy="145" r="3" fill="#27ae60"/>
+                  <circle cx="218" cy="112" r="5" fill="#e74c3c"/>
+                  <circle cx="228" cy="140" r="3" fill="#f39c12"/>
+                  <circle cx="208" cy="88" r="4" fill="#8e44ad"/>
+                  <line x1="5" y1="105" x2="16" y2="98" stroke="#f39c12" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="232" y1="125" x2="240" y2="115" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </div>
             <div class="success-decor">🎋 🐲 🎊 🎋</div>
             <button class="success-back-btn" id="t-success-back" onclick="resetForm()">返回重新报名</button>
         </div>
